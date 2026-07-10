@@ -27,7 +27,7 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-app.use('/api/research', researchRoutes);
+app.use('/api', researchRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
