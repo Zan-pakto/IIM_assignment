@@ -1,2 +1,10 @@
-// Config module to manage environment variable validations and loader configurations.
-export const config = {};
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
+export const config = {
+  port: parseInt(process.env.PORT || '4000', 10),
+  nodeEnv: process.env.NODE_ENV || 'development',
+  corsOrigin: process.env.CORS_ORIGIN || '*'
+};

@@ -1,7 +1,8 @@
-import express from "express";
-const app=express();
-app.listen(4000,console.log("server started on port 4000"))
+import app from './app.js';
+import { config } from './src/config/env.js';
 
-app.get("/",(req,res)=>{
-    res.send("Hello World")
-})
+const port = config.port;
+
+app.listen(port, () => {
+  console.log(`[Server] Running in ${config.nodeEnv} mode on port ${port}`);
+});
