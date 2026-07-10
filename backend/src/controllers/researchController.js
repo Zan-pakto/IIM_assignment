@@ -1,4 +1,25 @@
-// Route controller handling analysis submissions and client event streaming (SSE).
+import { graph } from '../graph/researchGraph.js';
+
+/**
+ * Wraps a promise in a timeout threshold rejection.
+ * @param {Promise} promise 
+ * @param {number} ms 
+ */
+const withTimeout = (promise, ms) => {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`Analysis timed out after ${ms / 1000} seconds.`));
+    }, ms);
+  });
+  return Promise.race([
+    promise.then((result) => {
+      clearTimeout(timeoutId);
+      return result;
+    }),
+    timeoutPromise
+  ]);
+};
 
 /**
  * Controller to handle company investment research analysis submissions.
@@ -28,12 +49,37 @@ export const analyzeCompany = async (req, res, next) => {
       });
     }
 
-    // Success response format (no AI logic yet)
+    // Set timeout to 90 seconds (allows sufficient time for search + LLM synthesis)
+    const TIMEOUT_MS = 90000;
+
+    console.log(`[Controller] Starting research pipeline for: ${company}`);
+    
+    // Invoke the compiled LangGraph workflow with timeout wrapping
+    const result = await withTimeout(
+      graph.invoke({ company }),
+      TIMEOUT_MS
+    );
+
+    console.log(`[Controller] Successfully completed research pipeline for: ${company}`);
+
+    // Return the final formatted report from the graph
     res.status(200).json({
       success: true,
-      data: {}
+      data: result.report || result
     });
   } catch (error) {
+    console.error(`[Controller] Error in research pipeline:`, error.message);
+    
+    // Differentiate timeout errors from other internal server issues
+    if (error.message.includes('timed out')) {
+      return res.status(504).json({
+        success: false,
+        error: "Gateway Timeout",
+        message: error.message
+      });
+    }
+    
+    // Forward other errors to the global errorHandler middleware
     next(error);
   }
 };
