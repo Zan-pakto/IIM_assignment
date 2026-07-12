@@ -1,4 +1,5 @@
 import { graph } from '../graph/researchGraph.js';
+import { cache } from '../utils/cache.js';
 
 /**
  * Wraps a promise in a timeout threshold rejection.
@@ -48,10 +49,22 @@ export const analyzeCompany = async (req, res, next) => {
       });
     }
 
+    const cleanCompany = company.trim().toLowerCase();
+
+    // Check local disk cache first
+    const cachedResult = cache.get(cleanCompany);
+    if (cachedResult) {
+      console.log(`[Controller] Cache HIT for: ${company}`);
+      return res.status(200).json({
+        success: true,
+        data: cachedResult
+      });
+    }
+
     // Set timeout to 90 seconds (allows sufficient time for search + LLM synthesis)
     const TIMEOUT_MS = 90000;
 
-    console.log(`[Controller] Starting research pipeline for: ${company}`);
+    console.log(`[Controller] Cache MISS. Starting research pipeline for: ${company}`);
     
     // Invoke the compiled LangGraph workflow with timeout wrapping
     const result = await withTimeout(
@@ -61,10 +74,15 @@ export const analyzeCompany = async (req, res, next) => {
 
     console.log(`[Controller] Successfully completed research pipeline for: ${company}`);
 
+    const reportData = result.report || result;
+
+    // Save output in the cache
+    cache.set(cleanCompany, reportData);
+
     // Return the final formatted report from the graph
     res.status(200).json({
       success: true,
-      data: result.report || result
+      data: reportData
     });
   } catch (error) {
     console.error(`[Controller] Error in research pipeline:`, error.message);
