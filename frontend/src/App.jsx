@@ -24,8 +24,9 @@ export default function App() {
     setLastCompany(companyName);
 
     try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
       // Perform the POST request to the backend API using Axios
-      const response = await axios.post('http://localhost:4000/api/analyze', {
+      const response = await axios.post(`${apiBase}/api/analyze`, {
         company: companyName
       });
 
