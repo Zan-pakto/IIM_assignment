@@ -1,1 +1,197 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-heading: "Outfit", sans-serif;
+  --font-serif: "Playfair Display", serif;
+
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2s infinite linear;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-in-up: fadeInUp 0.5s ease-out forwards;
+}
+
+:root {
+  /* Premium Light Theme Variables (Default) */
+  --bg-app: #faf9f6; /* Warm alabaster/cream */
+  --bg-card: #ffffff; /* Pure white */
+  --border-app: #e2e8f0; /* slate-200 */
+  --text-primary: #0f172a; /* slate-900 */
+  --text-secondary: #475569; /* slate-600 */
+  --text-muted: #64748b; /* slate-500 */
+  
+  --gold-primary: #a3762f; /* Premium bronze-gold */
+  --gold-hover: #8c6020;
+  --gold-light: #f7eedb;
+  --gold-glow: rgba(163, 118, 47, 0.08);
+  
+  --shadow-card: 0 4px 20px -2px rgba(15, 22, 42, 0.04), 0 2px 8px -1px rgba(15, 22, 42, 0.02);
+  --shadow-hover: 0 12px 30px -4px rgba(163, 118, 47, 0.08), 0 4px 12px -2px rgba(163, 118, 47, 0.04);
+}
+
+html.dark {
+  /* Premium Dark Theme Variables (Toggle) */
+  --bg-app: #060913; /* Deep navy/slate */
+  --bg-card: #0d1222; /* Slate card background */
+  --border-app: #1e293b; /* slate-800 */
+  --text-primary: #f8fafc; /* slate-50 */
+  --text-secondary: #94a3b8; /* slate-400 */
+  --text-muted: #64748b; /* slate-500 */
+  
+  --gold-primary: #cca359; /* Metallic gold */
+  --gold-hover: #b8863b;
+  --gold-light: #201808;
+  --gold-glow: rgba(204, 163, 89, 0.15);
+  
+  --shadow-card: 0 4px 30px -10px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 10px 30px -10px rgba(204, 163, 89, 0.15);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+  }
+
+  /* Transition for light-dark theme transitions */
+  div, nav, main, input, button, select, p, span, li, ul, svg, h2, h3, h1 {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-app);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Glassmorphism/Card styles bound to custom properties */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-app);
+}
+
+html.dark .glass-panel {
+  background: rgba(13, 18, 34, 0.7);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-app);
+  box-shadow: var(--shadow-card);
+}
+
+.glass-card:hover {
+  border-color: var(--gold-primary);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--gold-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-hover) 100%);
+}
+
+.glow-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.glow-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: 0.75s;
+  opacity: 0;
+}
+
+.glow-button:hover::after {
+  left: 125%;
+  opacity: 1;
+}
+
+.grid-bg {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(163, 118, 47, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(163, 118, 47, 0.03) 1px, transparent 1px);
+}
+
+html.dark .grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+}

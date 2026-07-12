@@ -13,9 +13,8 @@ const withTimeout = (promise, ms) => {
     }, ms);
   });
   return Promise.race([
-    promise.then((result) => {
+    promise.finally(() => {
       clearTimeout(timeoutId);
-      return result;
     }),
     timeoutPromise
   ]);
